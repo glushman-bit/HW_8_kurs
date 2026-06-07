@@ -2,6 +2,7 @@ from django.db import models
 
 
 class Course(models.Model):
+    """ Класс модели курса """
     name = models.CharField(
         max_length=200,
         verbose_name='Название курса',
@@ -30,6 +31,7 @@ class Course(models.Model):
 
 
 class Lesson(models.Model):
+    """ Класс модели урока """
     course = models.ForeignKey(
         Course,
         on_delete=models.CASCADE,
