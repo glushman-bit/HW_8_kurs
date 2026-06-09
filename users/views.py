@@ -15,7 +15,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class UserCreateAPIView(generics.CreateAPIView):
-    serializer_class = UserSerializer
+    serializer_class = UserCreateSerializer
     permission_classes = (AllowAny,)
 
     def perform_create(self, serializer):
