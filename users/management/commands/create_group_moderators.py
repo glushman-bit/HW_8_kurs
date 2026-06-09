@@ -1,11 +1,13 @@
-from django.core.management import BaseCommand
-from django.contrib.contenttypes.models import ContentType
-from materials.models import Course, Lesson
 from django.contrib.auth.models import Group, Permission
+from django.contrib.contenttypes.models import ContentType
+from django.core.management import BaseCommand
+
+from materials.models import Course, Lesson
 
 
 class Command(BaseCommand):
-    """ Кастомная команда для создания группы 'moderators' с назначением необходимых прав. """
+    """Кастомная команда для создания группы 'moderators' с назначением необходимых прав."""
+
     help = "Создает группу 'Менеджеры' и назначает ей базовые права доступа"
 
     def handle(self, *args, **options):
@@ -31,6 +33,4 @@ class Command(BaseCommand):
 
         group.permissions.set(permissions)
 
-        self.stdout.write(self.style.SUCCESS(
-            f"Группе успешно назначено прав: {permissions.count()} шт.")
-        )
+        self.stdout.write(self.style.SUCCESS(f"Группе успешно назначено прав: {permissions.count()} шт."))

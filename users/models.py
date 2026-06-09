@@ -5,7 +5,8 @@ from materials.models import Course, Lesson
 
 
 class User(AbstractUser):
-    """ Класс пользователя """
+    """Класс пользователя"""
+
     username = None
     email = models.EmailField(
         unique=True,
@@ -19,11 +20,7 @@ class User(AbstractUser):
         help_text="Введите номер телефона",
     )
     avatar = models.ImageField(
-        upload_to="users/avatar",
-        verbose_name="Аватар",
-        blank=True,
-        null=True,
-        help_text="Загрузить аватар"
+        upload_to="users/avatar", verbose_name="Аватар", blank=True, null=True, help_text="Загрузить аватар"
     )
     city = models.CharField(
         verbose_name="Город",
@@ -44,7 +41,7 @@ class User(AbstractUser):
 
 
 class Payment(models.Model):
-    """ Класс платежа """
+    """Класс платежа"""
 
     CASH = "cash"
     TRANSFER = "transfer"
@@ -54,22 +51,15 @@ class Payment(models.Model):
         (TRANSFER, "Перевод на счет"),
     ]
 
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="payments",
-        verbose_name="Пользователь"
-    )
-    date_payment = models.DateTimeField(
-        verbose_name="Дата платежа"
-    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="payments", verbose_name="Пользователь")
+    date_payment = models.DateTimeField(verbose_name="Дата платежа")
     paid_course = models.ForeignKey(
         Course,
         on_delete=models.CASCADE,
         blank=True,
         null=True,
         related_name="payments",
-        verbose_name="Оплаченный курс"
+        verbose_name="Оплаченный курс",
     )
     paid_lesson = models.ForeignKey(
         Lesson,
@@ -77,18 +67,10 @@ class Payment(models.Model):
         blank=True,
         null=True,
         related_name="payments",
-        verbose_name="Оплаченный урок"
+        verbose_name="Оплаченный урок",
     )
-    amount = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        verbose_name="Сумма оплаты"
-    )
-    payment_method = models.CharField(
-        max_length=20,
-        choices=PAYMENT_METHODS,
-        verbose_name="Способ оплаты"
-    )
+    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Сумма оплаты")
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, verbose_name="Способ оплаты")
 
     class Meta:
         verbose_name = "Платеж"

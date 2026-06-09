@@ -5,7 +5,9 @@ from users.models import User
 
 class Command(BaseCommand):
     """Команда для создания суперпользователя."""
+
     help = "Создание суперпользователя"
+
     def handle(self, *args, **options):
         user = User.objects.create(email="admin@sky.pro")
         user.set_password("1q2w3e")
