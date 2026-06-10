@@ -9,11 +9,14 @@ from users.serializers import PaymentSerializer, UserCreateSerializer, UserSeria
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    """Класс для работы с пользователями."""
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)
 
     def get_permissions(self):
+        """Получение прав доступа для изменения профиля пользователя."""
 
         if self.action in ["update", "partial_update"]:
             self.permission_classes = (IsProfile,)
@@ -21,6 +24,8 @@ class UserViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_serializer_class(self):
+        """Переопределение сериализатора."""
+
         if self.action == "retrieve":
             user = self.get_object()
 
@@ -31,16 +36,15 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class UserCreateAPIView(generics.CreateAPIView):
+    """Класс создания пользователя."""
+
     serializer_class = UserCreateSerializer
     permission_classes = (AllowAny,)
 
-    # def perform_create(self, serializer):
-    #     user = serializer.save(is_active=True)
-    #     user.set_password(user.password)
-    #     user.save()
-
 
 class PaymentListAPIView(generics.ListAPIView):
+    """Класс вывода информации о платежах."""
+
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]

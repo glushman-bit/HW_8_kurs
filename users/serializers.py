@@ -14,7 +14,7 @@ class PaymentSerializer(ModelSerializer):
 
 
 class PaymentInfoSerializer(ModelSerializer):
-    """Сериализатор вывода платежей"""
+    """Сериализатор вывода информации об оплаченных курсах и уроках."""
 
     paid_course = CourseSerializer()
     paid_lesson = LessonSerializer()
@@ -25,7 +25,7 @@ class PaymentInfoSerializer(ModelSerializer):
 
 
 class UserSerializer(ModelSerializer):
-    """Сериализатор вывода пользователей"""
+    """Сериализатор вывода данных об истории платежей пользователей"""
 
     pay_history = PaymentInfoSerializer(source='payments', many=True, read_only=True)
 
@@ -55,6 +55,8 @@ class UserCreateSerializer(ModelSerializer):
 
 
 class UserViewSerializer(ModelSerializer):
+    """Сериализатор представления данных о пользователях."""
+
     class Meta:
         model = User
         fields = (

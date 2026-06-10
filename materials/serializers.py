@@ -21,7 +21,8 @@ class LessonSerializer(ModelSerializer):
 
 
 class CourseSerializer(ModelSerializer):
-    """Сериализатор курсов"""
+    """Сериализатор вывода информации о курсах.
+    Подсчет количества уроков, уроки и их владельца."""
 
     count_lessons = SerializerMethodField()
     owner_email = SerializerMethodField()
@@ -29,9 +30,12 @@ class CourseSerializer(ModelSerializer):
 
     def get_count_lessons(self, lessons):
         """Подсчет количества уроков на курсе"""
+
         return Lesson.objects.filter(course=lessons).count()
 
     def get_owner_email(self, obj):
+        """Вывод информации об отсутствии владельца."""
+
         return obj.owner.email if obj.owner else "Владелец отсутствует"
 
     class Meta:
