@@ -4,13 +4,30 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from users.models import Payment, User
-from users.serializers import PaymentSerializer, UserCreateSerializer, UserSerializer
+from users.permissions import IsProfile
+from users.serializers import PaymentSerializer, UserCreateSerializer, UserSerializer, UserViewSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)
+
+    def get_permissions(self):
+
+        if self.action in ["update", "partial_update"]:
+            self.permission_classes = (IsProfile,)
+
+        return super().get_permissions()
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            user = self.get_object()
+
+            if user != self.request.user:
+                return UserViewSerializer
+
+        return UserSerializer
 
 
 class UserCreateAPIView(generics.CreateAPIView):

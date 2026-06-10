@@ -44,3 +44,14 @@ class UserCreateSerializer(ModelSerializer):
             "password",
         )
         extra_kwargs = {"password": {"write_only": True}}
+
+
+class UserViewSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "email",
+            "avatar",
+            "city",
+        )
