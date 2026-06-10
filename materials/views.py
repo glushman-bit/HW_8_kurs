@@ -10,6 +10,7 @@ from .serializers import CourseSerializer, LessonSerializer
 
 class CourseViewSet(ModelViewSet):
     """Класс работы с курсами."""
+
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     permission_classes = [IsAuthenticated, IsOwner]
