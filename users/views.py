@@ -34,10 +34,10 @@ class UserCreateAPIView(generics.CreateAPIView):
     serializer_class = UserCreateSerializer
     permission_classes = (AllowAny,)
 
-    def perform_create(self, serializer):
-        user = serializer.save(is_active=True)
-        user.set_password(user.password)
-        user.save()
+    # def perform_create(self, serializer):
+    #     user = serializer.save(is_active=True)
+    #     user.set_password(user.password)
+    #     user.save()
 
 
 class PaymentListAPIView(generics.ListAPIView):

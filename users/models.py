@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 from materials.models import Course, Lesson
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class User(AbstractUser):
@@ -12,7 +13,7 @@ class User(AbstractUser):
         unique=True,
         verbose_name="email",
     )
-    phone = models.CharField(
+    phone = PhoneNumberField(
         max_length=25,
         verbose_name="Номер телефона",
         blank=True,
