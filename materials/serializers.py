@@ -54,6 +54,9 @@ class CourseSerializer(ModelSerializer):
         """Вывод информации статуса подписки."""
         user = self.context.get("request").user
 
+        if not user.is_authenticated:
+            return False
+
         return Subscription.objects.filter(user=user, course=obj).exists()
 
     class Meta:
