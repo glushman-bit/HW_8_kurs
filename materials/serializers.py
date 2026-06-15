@@ -1,13 +1,15 @@
-from rest_framework import serializers
+from rest_framework.fields import URLField, EmailField
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from materials.models import Course, Lesson
+from materials.validators import VideoUrlValidator
 
 
 class LessonSerializer(ModelSerializer):
     """Сериализатор уроков"""
 
-    owner_email = serializers.EmailField(source="owner.email", read_only=True)
+    owner_email = EmailField(source="owner.email", read_only=True)
+    video_url = URLField(validators=[VideoUrlValidator()])
 
     class Meta:
         model = Lesson
@@ -16,6 +18,7 @@ class LessonSerializer(ModelSerializer):
             "course",
             "name",
             "description",
+            "video_url",
             "owner_email",
         )
 
