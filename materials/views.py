@@ -7,6 +7,7 @@ from rest_framework.response import Response
 
 from materials.models import Course, Lesson, Subscription
 from materials.permissions import IsModerator, IsOwner
+from .paginators import CourseLessonPagination
 
 from .serializers import CourseSerializer, LessonSerializer
 
@@ -17,6 +18,7 @@ class CourseViewSet(ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     permission_classes = [IsAuthenticated, IsOwner]
+    pagination_class = CourseLessonPagination
 
     def perform_create(self, serializer):
         """Автоматически определяем владельца при создании."""
@@ -59,6 +61,7 @@ class LessonListAPIView(ListAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = CourseLessonPagination
 
     def get_queryset(self):
         """Фильтруем вывод списка либо по группе "moderators", либо по владельцу"""
