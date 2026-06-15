@@ -1,7 +1,7 @@
 from rest_framework.fields import URLField, EmailField
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
-from materials.models import Course, Lesson
+from materials.models import Course, Lesson, Subscription
 from materials.validators import VideoUrlValidator
 
 
@@ -38,6 +38,7 @@ class CourseSerializer(ModelSerializer):
     count_lessons = SerializerMethodField()
     owner_email = SerializerMethodField()
     lessons = LessonSerializer(many=True, read_only=True)
+    is_subscribed = SerializerMethodField()
 
     def get_count_lessons(self, lessons):
         """Подсчет количества уроков на курсе"""
@@ -49,6 +50,12 @@ class CourseSerializer(ModelSerializer):
 
         return obj.owner.email if obj.owner else "Владелец отсутствует"
 
+    def get_is_subscribed(self, obj):
+        """Вывод информации статуса подписки."""
+        user = self.context.get("request").user
+
+        return Subscription.objects.filter(user=user, course=obj).exists()
+
     class Meta:
         model = Course
         fields = (
@@ -58,4 +65,5 @@ class CourseSerializer(ModelSerializer):
             "count_lessons",
             "lessons",
             "owner_email",
+            "is_subscribed",
         )
