@@ -1,8 +1,11 @@
 from django.db import models
 
+from config.settings import AUTH_USER_MODEL
+
 
 class Course(models.Model):
-    """ Класс модели курса """
+    """Класс модели курса"""
+
     name = models.CharField(
         max_length=200,
         verbose_name='Название курса',
@@ -21,6 +24,13 @@ class Course(models.Model):
         verbose_name='Превью курса',
         help_text='Загрузите превью',
     )
+    owner = models.ForeignKey(
+        AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        verbose_name="Владелец",
+    )
 
     class Meta:
         verbose_name = 'Курс'
@@ -31,7 +41,8 @@ class Course(models.Model):
 
 
 class Lesson(models.Model):
-    """ Класс модели урока """
+    """Класс модели урока"""
+
     course = models.ForeignKey(
         Course,
         on_delete=models.CASCADE,
@@ -61,6 +72,13 @@ class Lesson(models.Model):
         blank=True,
         null=True,
         verbose_name='Ссылка на урок',
+    )
+    owner = models.ForeignKey(
+        AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        verbose_name="Владелец",
     )
 
     class Meta:
