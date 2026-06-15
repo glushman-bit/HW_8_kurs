@@ -9,7 +9,15 @@ class LessonSerializer(ModelSerializer):
     """Сериализатор уроков"""
 
     owner_email = EmailField(source="owner.email", read_only=True)
-    video_url = URLField(validators=[VideoUrlValidator()])
+    video_url = URLField(
+        validators=[VideoUrlValidator()],
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        error_messages={
+            "invalid": "Введена не корректная ссылка."
+        }
+    )
 
     class Meta:
         model = Lesson

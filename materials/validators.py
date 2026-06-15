@@ -9,6 +9,10 @@ class VideoUrlValidator:
         self.message = message or f'Разрешены ссылки только на {allowed_domain}'
 
     def __call__(self, value):
+        # Пропуск валидации при отсутствии значения
+        if not value or str(value).strip():
+            return
+
         pattern = re.compile(re.escape(self.allowed_domain), re.IGNORECASE)
 
         if not re.search(pattern, value):
