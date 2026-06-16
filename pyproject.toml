@@ -16,6 +16,8 @@ django-filter = "^25.2"
 ipython = "^9.14.1"
 djangorestframework-simplejwt = "^5.5.1"
 django-phonenumber-field = {extras = ["phonenumbers"], version = "^8.4.0"}
+coverage = "^7.14.1"
+pytest = "^9.1.0"
 
 
 [tool.poetry.group.lint.dependencies]
