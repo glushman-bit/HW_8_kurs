@@ -1,7 +1,10 @@
 from rest_framework import status
 from rest_framework.test import APITestCase
 from django.urls import reverse
+from rest_framework.serializers import ValidationError
+from django.test import SimpleTestCase
 
+from materials.validators import VideoUrlValidator
 from users.models import User
 from materials.models import Course, Lesson, Subscription
 
@@ -217,3 +220,20 @@ class SubscriptionTestCase(BaseTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(data.get('message'), 'Подписка удалена')
         self.assertEqual(Subscription.objects.count(), 0)
+
+
+
+class VideoUrlValidatorTestCase(SimpleTestCase):
+
+    def setUp(self):
+        self.validator = VideoUrlValidator()
+
+    def test_valid_youtube_url(self):
+        self.validator("https://youtube.com/watch?v=123")
+
+    def test_invalid_url(self):
+        with self.assertRaises(ValidationError):
+            self.validator("https://google.com")
+
+    def test_empty_url(self):
+        self.validator("")

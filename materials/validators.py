@@ -10,7 +10,7 @@ class VideoUrlValidator:
 
     def __call__(self, value):
         # Пропуск валидации при отсутствии значения
-        if not value or str(value).strip():
+        if value in (None, ""):
             return
 
         pattern = re.compile(re.escape(self.allowed_domain), re.IGNORECASE)
