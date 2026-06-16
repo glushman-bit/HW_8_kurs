@@ -1,5 +1,6 @@
-from rest_framework.serializers import ValidationError
 import re
+
+from rest_framework.serializers import ValidationError
 
 
 class VideoUrlValidator:

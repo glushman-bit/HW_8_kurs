@@ -1,6 +1,7 @@
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-from django.urls import reverse
+
 from users.models import User
 
 
@@ -13,7 +14,6 @@ class UsersTestCase(APITestCase):
         self.user2 = User.objects.create(email='user2@test.pro')
         self.user2.set_password('12345')
         self.user2.save()
-        # self.client.force_authenticate(user=self.user)
 
     def test_create_user(self):
         url = reverse('users:register')
@@ -46,10 +46,9 @@ class UsersTestCase(APITestCase):
         """Проверка изменения своего профиля."""
         url = reverse('users:user-detail', args=(self.user1.pk,))
         self.client.force_authenticate(user=self.user1)
-        data = {
-            'city': 'Moscow'
-        }
+        data = {'city': 'Moscow'}
         response = self.client.patch(url, data)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Получаем актуальные данные из БД
         self.user1.refresh_from_db()
@@ -74,10 +73,9 @@ class UsersTestCase(APITestCase):
         """Проверка запрета на изменение чужого профиля."""
         url = reverse('users:user-detail', args=(self.user2.pk,))
         self.client.force_authenticate(user=self.user1)
-        data = {
-            'city': 'Moscow'
-        }
+        data = {'city': 'Moscow'}
         response = self.client.patch(url, data)
+
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertNotEqual(self.user2.city, 'Moscow')
         # Получаем актуальные данные из БД

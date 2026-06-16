@@ -1,4 +1,4 @@
-from rest_framework.fields import URLField, EmailField
+from rest_framework.fields import EmailField, URLField
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from materials.models import Course, Lesson, Subscription
@@ -14,9 +14,7 @@ class LessonSerializer(ModelSerializer):
         required=False,
         allow_blank=True,
         allow_null=True,
-        error_messages={
-            "invalid": "Введена не корректная ссылка."
-        }
+        error_messages={"invalid": "Введена не корректная ссылка."},
     )
 
     class Meta:

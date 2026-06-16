@@ -1,12 +1,12 @@
-from rest_framework import status
-from rest_framework.test import APITestCase
-from django.urls import reverse
-from rest_framework.serializers import ValidationError
 from django.test import SimpleTestCase
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.serializers import ValidationError
+from rest_framework.test import APITestCase
 
+from materials.models import Course, Lesson, Subscription
 from materials.validators import VideoUrlValidator
 from users.models import User
-from materials.models import Course, Lesson, Subscription
 
 
 class BaseTestCase(APITestCase):
@@ -14,11 +14,7 @@ class BaseTestCase(APITestCase):
 
     def setUp(self):
         self.user = User.objects.create(email='test_test@sky.pro')
-        self.course = Course.objects.create(
-            name='Course_1',
-            description='desc_Course_1',
-            owner=self.user
-        )
+        self.course = Course.objects.create(name='Course_1', description='desc_Course_1', owner=self.user)
         self.lesson = Lesson.objects.create(
             name='lesson_test',
             description='desc_lesson_test',
@@ -26,6 +22,7 @@ class BaseTestCase(APITestCase):
             owner=self.user,
         )
         self.client.force_authenticate(user=self.user)
+
 
 class LessonTestCase(BaseTestCase):
     """TestCase для урока."""
@@ -102,7 +99,7 @@ class LessonTestCase(BaseTestCase):
                     "video_url": None,
                     "owner_email": self.user.email,
                 }
-            ]
+            ],
         }
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(data, result)
@@ -183,12 +180,12 @@ class CourseTestCase(BaseTestCase):
                             "description": self.lesson.description,
                             "video_url": None,
                             "owner_email": self.user.email,
-                         }
+                        }
                     ],
                     "owner_email": self.user.email,
-                    "is_subscribed": False
+                    "is_subscribed": False,
                 }
-            ]
+            ],
         }
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(data, result)
@@ -222,18 +219,21 @@ class SubscriptionTestCase(BaseTestCase):
         self.assertEqual(Subscription.objects.count(), 0)
 
 
-
 class VideoUrlValidatorTestCase(SimpleTestCase):
+    """Тестирование валидатора поля 'video_url'."""
 
     def setUp(self):
         self.validator = VideoUrlValidator()
 
     def test_valid_youtube_url(self):
+        """Тест на валидную ссылку."""
         self.validator("https://youtube.com/watch?v=123")
 
     def test_invalid_url(self):
+        """Тест на невалидную ссылку."""
         with self.assertRaises(ValidationError):
             self.validator("https://google.com")
 
     def test_empty_url(self):
+        """Тест на пустую строку."""
         self.validator("")
