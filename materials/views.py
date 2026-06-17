@@ -1,10 +1,20 @@
-from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView
+from rest_framework.generics import (
+    CreateAPIView,
+    DestroyAPIView,
+    ListAPIView,
+    RetrieveAPIView,
+    UpdateAPIView,
+    get_object_or_404,
+)
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from materials.models import Course, Lesson
+from materials.models import Course, Lesson, Subscription
 from materials.permissions import IsModerator, IsOwner
 
+from .paginators import CourseLessonPagination
 from .serializers import CourseSerializer, LessonSerializer
 
 
@@ -14,6 +24,7 @@ class CourseViewSet(ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     permission_classes = [IsAuthenticated, IsOwner]
+    pagination_class = CourseLessonPagination
 
     def perform_create(self, serializer):
         """Автоматически определяем владельца при создании."""
@@ -56,6 +67,7 @@ class LessonListAPIView(ListAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = CourseLessonPagination
 
     def get_queryset(self):
         """Фильтруем вывод списка либо по группе "moderators", либо по владельцу"""
@@ -101,3 +113,20 @@ class LessonDestroyAPIView(DestroyAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated, IsOwner]
+
+
+class SubscriptionAPIView(APIView):
+
+    def post(self, request, pk):
+        user = request.user
+        course = get_object_or_404(Course, pk=pk)
+        subscription = Subscription.objects.filter(user=user, course=course)
+
+        if subscription.exists():
+            subscription.delete()
+            message = 'Подписка удалена'
+        else:
+            Subscription.objects.create(user=user, course=course)
+            message = 'Подписка добавлена'
+
+        return Response({'message': message})
