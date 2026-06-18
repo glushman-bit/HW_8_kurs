@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from users.models import User
+from users.models import User, Payment
 
 
 @admin.register(User)
@@ -14,3 +14,10 @@ class UserAdmin(admin.ModelAdmin):
     )
     search_fields = ('email',)
     exclude = ('password',)
+
+@admin.register(Payment)
+class PaymentAdmin(admin.ModelAdmin):
+    list_filter = ('user',)
+    list_display = (
+        'date_payment',
+    )

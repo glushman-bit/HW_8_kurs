@@ -46,14 +46,19 @@ class Payment(models.Model):
 
     CASH = "cash"
     TRANSFER = "transfer"
+    STRIPE_TRANSFER = "stripe_transfer"
 
     PAYMENT_METHODS = [
         (CASH, "Оплата наличными"),
         (TRANSFER, "Перевод на счет"),
+        (STRIPE_TRANSFER, "Stripe"),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="payments", verbose_name="Пользователь")
-    date_payment = models.DateTimeField(verbose_name="Дата платежа")
+    date_payment = models.DateTimeField(
+        verbose_name="Дата платежа",
+        auto_now_add=True,
+    )
     paid_course = models.ForeignKey(
         Course,
         on_delete=models.CASCADE,
@@ -85,7 +90,12 @@ class Payment(models.Model):
         verbose_name="Ссылка на оплату",
         help_text="Укажите ссылку на оплату"
     )
-    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, verbose_name="Способ оплаты")
+    payment_method = models.CharField(
+        max_length=20,
+        choices=PAYMENT_METHODS,
+        default=STRIPE_TRANSFER,
+        verbose_name="Способ оплаты"
+    )
 
     class Meta:
         verbose_name = "Платеж"
