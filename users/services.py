@@ -2,7 +2,7 @@ import stripe
 
 from config import settings
 from config.settings import STRIPE_API_KEY
-
+from rest_framework.serializers import ValidationError
 
 stripe.api_key = STRIPE_API_KEY
 
@@ -38,4 +38,17 @@ def create_stripe_session(price):
 
     return session.id, session.url
 
+
+def get_status_session(payment):
+    """"""
+    if not payment.session_id:
+        raise ValidationError("Для данного платежа отсутствует session_id.")
+    print(payment.session_id)
+    
+    session = stripe.checkout.Session.retrieve(payment.session_id)
+
+    payment.status = session.payment_status
+    payment.save(update_fields=["status"])
+
+    return payment
 
