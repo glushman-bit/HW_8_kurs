@@ -6,6 +6,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from users.models import Payment, User
 from users.permissions import IsProfile
 from users.serializers import PaymentSerializer, UserCreateSerializer, UserSerializer, UserViewSerializer
+from users.services import create_stripe_price, create_stripe_session, create_stripe_product
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -57,3 +58,23 @@ class PaymentListAPIView(generics.ListAPIView):
     )
     filterset_fields = ('payment_method',)
     ordering_fields = ('date_payment',)
+
+
+class PaymentCreateAPIView(generics.CreateAPIView):
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer
+
+    def perform_create(self, serializer):
+        payment = serializer.save(user=self.request.user)
+
+        if payment.paid_course:
+            product_name = payment.paid_course.name
+        else:
+            product_name = payment.paid_lesson.name
+
+        product = create_stripe_product(product_name)
+        price = create_stripe_price(product.id, payment.amount)
+        session_id, payment_link = create_stripe_session(price)
+        payment.session_id = session_id
+        payment.link = payment_link
+        payment.save()
