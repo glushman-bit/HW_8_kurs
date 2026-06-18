@@ -19,6 +19,8 @@ django-phonenumber-field = {extras = ["phonenumbers"], version = "^8.4.0"}
 coverage = "^7.14.1"
 pytest = "^9.1.0"
 drf-yasg = "^1.21.15"
+stripe = "^15.2.1"
+forex-python = "^1.9.2"
 
 
 [tool.poetry.group.lint.dependencies]
