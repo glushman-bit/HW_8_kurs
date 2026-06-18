@@ -53,7 +53,16 @@ class CourseViewSet(ModelViewSet):
         return [permission() for permission in self.permission_classes]
 
     def get_queryset(self):
-        """Фильтруем вывод списка либо по группе "moderators", либо по владельцу."""
+        """Фильтруем вывод списка либо по группе "moderators", либо по владельцу.
+            О"""
+
+        # Если Swagger строит схему
+        if getattr(self, "swagger_fake_view", False):
+            return Course.objects.none()
+
+        # Если пользователь не авторизован
+        if not self.request.user.is_authenticated:
+            return Course.objects.none()
 
         if self.request.user.groups.filter(name="moderators").exists():
             return Course.objects.all()

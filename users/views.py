@@ -26,6 +26,9 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         """Переопределение сериализатора."""
 
+        if getattr(self, "swagger_fake_view", False):
+            return UserSerializer
+
         if self.action == "retrieve":
             user = self.get_object()
 
