@@ -1,8 +1,10 @@
+from rest_framework.fields import CharField
 from rest_framework.serializers import ModelSerializer
 
 from materials.serializers import CourseSerializer, LessonSerializer
 
 from .models import Payment, User
+from .validators import validate_payment_choice
 
 
 class PaymentSerializer(ModelSerializer):
@@ -11,7 +13,15 @@ class PaymentSerializer(ModelSerializer):
     class Meta:
         model = Payment
         fields = "__all__"
+        read_only_fields = (
+            "user",
+            "session_id",
+            "link",
+            "date_payment",
+        )
 
+    def validate(self, attrs):
+        return validate_payment_choice(attrs)
 
 class PaymentInfoSerializer(ModelSerializer):
     """Сериализатор вывода информации об оплаченных курсах и уроках."""
