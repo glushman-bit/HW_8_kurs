@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework_simplejwt',
     'phonenumber_field',
+    'drf_yasg',
 
     'users',
     'materials',
@@ -99,6 +100,18 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=50),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': 'Введите JWT токен в формате: Bearer <access_token>',
+        }
+    },
+    'USE_SESSION_AUTH': False,
 }
 
 # Password validation
