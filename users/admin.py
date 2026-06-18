@@ -19,5 +19,7 @@ class UserAdmin(admin.ModelAdmin):
 class PaymentAdmin(admin.ModelAdmin):
     list_filter = ('user',)
     list_display = (
+        'id',
+        'user',
         'date_payment',
     )
