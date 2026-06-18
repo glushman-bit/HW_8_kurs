@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from users.models import Payment, User
 from users.permissions import IsProfile
 from users.serializers import PaymentSerializer, UserCreateSerializer, UserSerializer, UserViewSerializer
-from users.services import create_stripe_price, create_stripe_session, create_stripe_product
+from users.services import create_stripe_price, create_stripe_session, create_stripe_product, get_status_session
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -77,4 +77,17 @@ class PaymentCreateAPIView(generics.CreateAPIView):
         session_id, payment_link = create_stripe_session(price)
         payment.session_id = session_id
         payment.link = payment_link
+
         payment.save()
+
+
+class PaymentRetrieveAPIView(generics.RetrieveAPIView):
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer
+
+    def get_object(self):
+
+        payment = super().get_object()
+        get_status_session(payment)
+
+        return payment
