@@ -96,6 +96,12 @@ class Payment(models.Model):
         default=STRIPE_TRANSFER,
         verbose_name="Способ оплаты"
     )
+    status = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+        verbose_name="Статус платежа"
+    )
 
     class Meta:
         verbose_name = "Платеж"
