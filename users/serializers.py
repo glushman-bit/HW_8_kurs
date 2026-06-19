@@ -1,4 +1,3 @@
-from rest_framework.fields import CharField
 from rest_framework.serializers import ModelSerializer
 
 from materials.serializers import CourseSerializer, LessonSerializer
@@ -22,6 +21,7 @@ class PaymentSerializer(ModelSerializer):
 
     def validate(self, attrs):
         return validate_payment_choice(attrs)
+
 
 class PaymentInfoSerializer(ModelSerializer):
     """Сериализатор вывода информации об оплаченных курсах и уроках."""

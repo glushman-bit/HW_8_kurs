@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from users.models import Payment, User
 from users.permissions import IsProfile
 from users.serializers import PaymentSerializer, UserCreateSerializer, UserSerializer, UserViewSerializer
-from users.services import create_stripe_price, create_stripe_session, create_stripe_product, get_status_session
+from users.services import create_stripe_price, create_stripe_product, create_stripe_session, get_status_session
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -25,7 +25,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
     def get_serializer_class(self):
-        """Переопределение сериализатора."""
+        """Переопределение сериализатора. Добавлена защита от ошибки построения схемы Swagger."""
 
         if getattr(self, "swagger_fake_view", False):
             return UserSerializer

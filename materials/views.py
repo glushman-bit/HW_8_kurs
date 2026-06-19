@@ -54,13 +54,11 @@ class CourseViewSet(ModelViewSet):
 
     def get_queryset(self):
         """Фильтруем вывод списка либо по группе "moderators", либо по владельцу.
-            О"""
+        Добавлена защита от ошибки построения схемы Swagger."""
 
-        # Если Swagger строит схему
         if getattr(self, "swagger_fake_view", False):
             return Course.objects.none()
 
-        # Если пользователь не авторизован
         if not self.request.user.is_authenticated:
             return Course.objects.none()
 
@@ -125,6 +123,7 @@ class LessonDestroyAPIView(DestroyAPIView):
 
 
 class SubscriptionAPIView(APIView):
+    """Класс представления подписки."""
 
     def post(self, request, pk):
         user = request.user

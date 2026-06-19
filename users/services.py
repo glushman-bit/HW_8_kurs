@@ -1,10 +1,11 @@
 import stripe
+from rest_framework.serializers import ValidationError
 
 from config import settings
 from config.settings import STRIPE_API_KEY
-from rest_framework.serializers import ValidationError
 
 stripe.api_key = STRIPE_API_KEY
+
 
 def create_stripe_product(name='Product'):
     """Создание продукта в Stripe."""
@@ -14,14 +15,13 @@ def create_stripe_product(name='Product'):
     return product
 
 
-
 def create_stripe_price(product_id, amount):
     """Создание продукта в Stripe."""
 
     price = stripe.Price.create(
-      currency="rub",
-      unit_amount=int(amount * 100),
-      product=product_id,
+        currency="rub",
+        unit_amount=int(amount * 100),
+        product=product_id,
     )
 
     return price
@@ -40,15 +40,14 @@ def create_stripe_session(price):
 
 
 def get_status_session(payment):
-    """"""
+    """Получения статуса платежа Stripe."""
+
     if not payment.session_id:
         raise ValidationError("Для данного платежа отсутствует session_id.")
-    print(payment.session_id)
-    
+
     session = stripe.checkout.Session.retrieve(payment.session_id)
 
     payment.status = session.payment_status
     payment.save(update_fields=["status"])
 
     return payment
-
