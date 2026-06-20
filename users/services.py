@@ -18,9 +18,12 @@ def create_stripe_product(name='Product'):
 def create_stripe_price(product_id, amount):
     """Создание продукта в Stripe."""
 
+    if amount < 10000:
+        raise ValidationError("Цена не может быть менее 10000 копеек.")
+
     price = stripe.Price.create(
         currency="rub",
-        unit_amount=int(amount * 100),
+        unit_amount=amount,
         product=product_id,
     )
 
