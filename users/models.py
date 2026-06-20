@@ -75,7 +75,7 @@ class Payment(models.Model):
         related_name="payments",
         verbose_name="Оплаченный урок",
     )
-    amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Сумма оплаты")
+    amount = models.PositiveIntegerField(verbose_name="Сумма оплаты в копейках")
     session_id = models.CharField(
         max_length=255, blank=True, null=True, verbose_name="ID сессии", help_text="Укажите ID сессии"
     )
