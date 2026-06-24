@@ -16,9 +16,12 @@ from materials.permissions import IsModerator, IsOwner
 
 from .paginators import CourseLessonPagination
 from .serializers import CourseSerializer, LessonSerializer
-
-from .tasks import send_information_about_add_course, \
-    send_information_about_update_course, send_information_about_add_lesson, send_information_about_update_lesson
+from .tasks import (
+    send_information_about_add_course,
+    send_information_about_add_lesson,
+    send_information_about_update_course,
+    send_information_about_update_lesson,
+)
 
 
 class CourseViewSet(ModelViewSet):
@@ -105,7 +108,7 @@ class LessonCreateAPIView(CreateAPIView):
 
     def perform_create(self, serializer):
         """Автоматически определяем владельца при создании.
-            Отправка письма о создании урока."""
+        Отправка письма о создании урока."""
 
         instance = serializer.save(owner=self.request.user)
 
