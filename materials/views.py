@@ -17,6 +17,9 @@ from materials.permissions import IsModerator, IsOwner
 from .paginators import CourseLessonPagination
 from .serializers import CourseSerializer, LessonSerializer
 
+from .tasks import send_information_about_add_course, \
+    send_information_about_update_course, send_information_about_add_lesson, send_information_about_update_lesson
+
 
 class CourseViewSet(ModelViewSet):
     """Класс работы с курсами."""
@@ -32,6 +35,7 @@ class CourseViewSet(ModelViewSet):
         course = serializer.save()
         course.owner = self.request.user
         course.save()
+        send_information_about_add_course.delay(course.owner.email, course.name)
 
     def get_permissions(self):
         """Фильтруем действия создания, просмотр, редактирование, удаление
@@ -67,6 +71,13 @@ class CourseViewSet(ModelViewSet):
 
         return Course.objects.filter(owner=self.request.user)
 
+    def perform_update(self, serializer):
+        """Отправка письма об изменении курса."""
+        course = serializer.save()
+
+        if self.action in ["update", "partial_update"]:
+            send_information_about_update_course.delay(course.owner.email, course.name)
+
 
 class LessonListAPIView(ListAPIView):
     """Класс вывода списка уроков."""
@@ -93,9 +104,15 @@ class LessonCreateAPIView(CreateAPIView):
     permission_classes = [IsAuthenticated, ~IsModerator]
 
     def perform_create(self, serializer):
-        """Автоматически определяем владельца при создании"""
+        """Автоматически определяем владельца при создании.
+            Отправка письма о создании урока."""
 
-        serializer.save(owner=self.request.user)
+        instance = serializer.save(owner=self.request.user)
+
+        user = self.request.user
+        course_name = instance.course.name if instance.course else None
+        if user.email:
+            send_information_about_add_lesson.delay(user.email, instance.name, course_name)
 
 
 class LessonRetrieveAPIView(RetrieveAPIView):
@@ -112,6 +129,14 @@ class LessonUpdateAPIView(UpdateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated, IsModerator | IsOwner]
+
+    def perform_update(self, serializer):
+        """Отправка письма при изменении урока"""
+        instance = serializer.save()
+        user = instance.owner
+        course_name = instance.course.name if instance.course else None
+
+        send_information_about_update_lesson.delay(user.email, instance.name, course_name)
 
 
 class LessonDestroyAPIView(DestroyAPIView):
