@@ -1,3 +1,6 @@
+from datetime import timedelta
+
+from django.utils import timezone
 from rest_framework.generics import (
     CreateAPIView,
     DestroyAPIView,
@@ -138,8 +141,20 @@ class LessonUpdateAPIView(UpdateAPIView):
         instance = serializer.save()
         user = instance.owner
         course_name = instance.course.name if instance.course else None
+        course = instance.course
 
-        send_information_about_update_lesson.delay(user.email, instance.name, course_name)
+        if course:
+            now = timezone.now()
+            time_since_last_update = now - course.updated_at
+
+            if time_since_last_update > timedelta(hours=4):
+                course.save()
+
+                if user.email:
+                    send_information_about_update_lesson.delay(user.email, instance.name, course_name)
+
+                else:
+                    None
 
 
 class LessonDestroyAPIView(DestroyAPIView):

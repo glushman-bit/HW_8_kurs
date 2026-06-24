@@ -15,7 +15,7 @@ def send_information_about_add_course(email, name):
     send_mail(
         subject=f'Добавлен курс {name}.',
         message=f'Обратите внимание! Вам добавлен новый курс {name}. '
-                f'Для более подробной информации посетите сайт.',
+        f'Для более подробной информации посетите сайт.',
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[email],
         fail_silently=False,
@@ -30,7 +30,7 @@ def send_information_about_update_course(email, name):
     send_mail(
         subject=f'Курс "{name}" был обновлен.',
         message=f'Обратите внимание! Внесены изменения в курс {name}. '
-                f'Для более подробной информации посетите сайт.',
+        f'Для более подробной информации посетите сайт.',
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[email],
         fail_silently=False,
@@ -45,7 +45,7 @@ def send_information_about_add_lesson(email, name, course_name):
     send_mail(
         subject=f'Добавлен урок {name}.',
         message=f'Обратите внимание! Вам добавлен новый урок {name} в курс {course_name}. '
-                f'Для более подробной информации посетите сайт.',
+        f'Для более подробной информации посетите сайт.',
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[email],
         fail_silently=False,
@@ -60,7 +60,7 @@ def send_information_about_update_lesson(email, name, course_name):
     send_mail(
         subject=f'Информация об уроке {name}.',
         message=f'Обратите внимание! Информация об уроке {name} курса {course_name} изменилась. '
-                f'Для более подробной информации посетите сайт.',
+        f'Для более подробной информации посетите сайт.',
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[email],
         fail_silently=False,

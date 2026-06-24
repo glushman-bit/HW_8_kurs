@@ -31,6 +31,9 @@ class Course(models.Model):
         null=True,
         verbose_name='Владелец',
     )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
 
     class Meta:
         verbose_name = 'Курс'
