@@ -16,8 +16,8 @@ from materials.permissions import IsModerator, IsOwner
 
 from .paginators import CourseLessonPagination
 from .serializers import CourseSerializer, LessonSerializer
-from .tasks import send_information_about_add_course
 from .services import notify_subscribes
+from .tasks import send_information_about_add_course
 
 
 class CourseViewSet(ModelViewSet):

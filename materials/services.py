@@ -19,15 +19,13 @@ def notify_subscribes(course_id, old_updated_at):
         Course.objects.filter(pk=course_id).update(updated_at=now)
 
         email_list = list(
-            Subscription.objects.filter(course_id=course_id, user__is_active=True)
-            .values_list('user__email', flat=True)
+            Subscription.objects.filter(course_id=course_id, user__is_active=True).values_list(
+                'user__email', flat=True
+            )
         )
 
         if email_list:
             course_name = Course.objects.filter(pk=course_id).values_list('name', flat=True).first()
-            send_information_about_update_course.delay(
-                email_list=email_list,
-                course_name=course_name
-            )
+            send_information_about_update_course.delay(email_list=email_list, course_name=course_name)
         else:
             print("Прошло слишком мало времени с прошлого обновления. Рассылка пропущена.")

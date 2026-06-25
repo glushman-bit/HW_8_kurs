@@ -39,6 +39,6 @@ def send_information_about_update_course(email_list, course_name):
         )
         messages.append(message_data)
 
-    send_mass_mail(tuple(messages), fail_silently=False)
+    send_mass_mail(messages, fail_silently=False)
 
     logger.info('Письмо об изменении курса отправлено.')
