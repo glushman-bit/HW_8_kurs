@@ -2,6 +2,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from celery.schedules import crontab
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -173,9 +174,9 @@ CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 CELERY_BEAT_SCHEDULE = {
-    "send_information_about_birthday": {
-        "task": "dogs.tasks.send_information_about_birthday",
-        "schedule": timedelta(),
+    "check_user_is_active": {
+        "task": "users.tasks.check_user_is_active",
+        "schedule": crontab(hour=2, minute=0),
     },
 }
 
