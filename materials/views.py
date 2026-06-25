@@ -1,6 +1,3 @@
-from datetime import timedelta
-
-from django.utils import timezone
 from rest_framework.generics import (
     CreateAPIView,
     DestroyAPIView,
@@ -19,12 +16,8 @@ from materials.permissions import IsModerator, IsOwner
 
 from .paginators import CourseLessonPagination
 from .serializers import CourseSerializer, LessonSerializer
-from .tasks import (
-    send_information_about_add_course,
-    send_information_about_add_lesson,
-    send_information_about_update_course,
-    send_information_about_update_lesson,
-)
+from .tasks import send_information_about_add_course
+from .services import notify_subscribes
 
 
 class CourseViewSet(ModelViewSet):
@@ -79,10 +72,12 @@ class CourseViewSet(ModelViewSet):
 
     def perform_update(self, serializer):
         """Отправка письма об изменении курса."""
-        course = serializer.save()
 
-        if self.action in ["update", "partial_update"]:
-            send_information_about_update_course.delay(course.owner.email, course.name)
+        course_id = self.get_object().pk
+        old_updated_at = self.get_object().updated_at
+        serializer.save()
+
+        notify_subscribes(course_id, old_updated_at)
 
 
 class LessonListAPIView(ListAPIView):
@@ -113,12 +108,12 @@ class LessonCreateAPIView(CreateAPIView):
         """Автоматически определяем владельца при создании.
         Отправка письма о создании урока."""
 
-        instance = serializer.save(owner=self.request.user)
+        lesson_instance = serializer.save(owner=self.request.user)
 
-        user = self.request.user
-        course_name = instance.course.name if instance.course else None
-        if user.email:
-            send_information_about_add_lesson.delay(user.email, instance.name, course_name)
+        course = lesson_instance.course
+
+        if course:
+            notify_subscribes(course_id=course.id, old_updated_at=course.updated_at)
 
 
 class LessonRetrieveAPIView(RetrieveAPIView):
@@ -138,23 +133,14 @@ class LessonUpdateAPIView(UpdateAPIView):
 
     def perform_update(self, serializer):
         """Отправка письма при изменении урока"""
-        instance = serializer.save()
-        user = instance.owner
-        course_name = instance.course.name if instance.course else None
-        course = instance.course
+
+        lesson_instance = self.get_object()
+        course = lesson_instance.course
+
+        serializer.save()
 
         if course:
-            now = timezone.now()
-            time_since_last_update = now - course.updated_at
-
-            if time_since_last_update > timedelta(hours=4):
-                course.save()
-
-                if user.email:
-                    send_information_about_update_lesson.delay(user.email, instance.name, course_name)
-
-                else:
-                    None
+            notify_subscribes(course_id=course.id, old_updated_at=course.updated_at)
 
 
 class LessonDestroyAPIView(DestroyAPIView):
