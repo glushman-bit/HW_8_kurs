@@ -16,6 +16,8 @@ from materials.permissions import IsModerator, IsOwner
 
 from .paginators import CourseLessonPagination
 from .serializers import CourseSerializer, LessonSerializer
+from .services import notify_subscribes
+from .tasks import send_information_about_add_course
 
 
 class CourseViewSet(ModelViewSet):
@@ -32,6 +34,7 @@ class CourseViewSet(ModelViewSet):
         course = serializer.save()
         course.owner = self.request.user
         course.save()
+        send_information_about_add_course.delay(course.owner.email, course.name)
 
     def get_permissions(self):
         """Фильтруем действия создания, просмотр, редактирование, удаление
@@ -67,6 +70,15 @@ class CourseViewSet(ModelViewSet):
 
         return Course.objects.filter(owner=self.request.user)
 
+    def perform_update(self, serializer):
+        """Отправка письма об изменении курса."""
+
+        course_id = self.get_object().pk
+        old_updated_at = self.get_object().updated_at
+        serializer.save()
+
+        notify_subscribes(course_id, old_updated_at)
+
 
 class LessonListAPIView(ListAPIView):
     """Класс вывода списка уроков."""
@@ -93,9 +105,15 @@ class LessonCreateAPIView(CreateAPIView):
     permission_classes = [IsAuthenticated, ~IsModerator]
 
     def perform_create(self, serializer):
-        """Автоматически определяем владельца при создании"""
+        """Автоматически определяем владельца при создании.
+        Отправка письма о создании урока."""
 
-        serializer.save(owner=self.request.user)
+        lesson_instance = serializer.save(owner=self.request.user)
+
+        course = lesson_instance.course
+
+        if course:
+            notify_subscribes(course_id=course.id, old_updated_at=course.updated_at)
 
 
 class LessonRetrieveAPIView(RetrieveAPIView):
@@ -112,6 +130,17 @@ class LessonUpdateAPIView(UpdateAPIView):
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated, IsModerator | IsOwner]
+
+    def perform_update(self, serializer):
+        """Отправка письма при изменении урока"""
+
+        lesson_instance = self.get_object()
+        course = lesson_instance.course
+
+        serializer.save()
+
+        if course:
+            notify_subscribes(course_id=course.id, old_updated_at=course.updated_at)
 
 
 class LessonDestroyAPIView(DestroyAPIView):

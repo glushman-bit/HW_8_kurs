@@ -21,6 +21,10 @@ pytest = "^9.1.0"
 drf-yasg = "^1.21.15"
 stripe = "^15.2.1"
 forex-python = "^1.9.2"
+celery = "^5.6.3"
+django-celery-beat = "^2.9.0"
+redis = "7.4.0"
+eventlet = "^0.41.0"
 
 
 [tool.poetry.group.lint.dependencies]
