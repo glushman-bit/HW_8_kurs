@@ -33,14 +33,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'rest_framework',
     'django_filters',
     'rest_framework_simplejwt',
     'phonenumber_field',
     'drf_yasg',
     'django_celery_beat',
-
     'users',
     'materials',
 ]
@@ -97,7 +95,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         # 'rest_framework.permissions.AllowAny', # Доступ всем
-        'rest_framework.permissions.IsAuthenticated', # Доступ только авторизованным
+        'rest_framework.permissions.IsAuthenticated',  # Доступ только авторизованным
     ],
 }
 
@@ -148,7 +146,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 
 # Static files (CSS, JavaScript, Images)
