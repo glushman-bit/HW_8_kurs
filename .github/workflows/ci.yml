@@ -25,6 +25,26 @@ jobs:
   test:
     needs: lint
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+
+    env:
+      SECRET_KEY: test-secret-key
+      DEBUG: False
+      POSTGRES_DB: test_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
+
     steps:
       - name: Check out code
         uses: actions/checkout@v6
@@ -75,8 +95,8 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/HW_8_Kurs_b35:${{ github.sha }}
-            docker stop myapp || true
-            docker rm myapp || true
+            docker stop HW_8_Kurs_b35 || true
+            docker rm HW_8_Kurs_b35 || true
             docker run -d \
           --name HW_8_Kurs_b35 \
           --env-file ${{ secrets.DEPLOY_DIR }}/.env \

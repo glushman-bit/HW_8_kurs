@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: sh -c 'python manage.py migrate && python manage.py runserver 0.0.0.0:8000'
+    command: sh -c 'python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000'
     volumes:
       - .:/app
     ports:
@@ -20,6 +20,7 @@ services:
       - "80:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - static_volume:/app/staticfiles
     depends_on:
       - web
 
@@ -41,12 +42,7 @@ services:
       timeout: 10s
       retries: 5
 
-  redis:
-    image: redis:7
-    volumes:
-      - redis_data:/data
-    env_file:
-      - ./.env
-
 volumes:
   postgres_data:
+  static_volume:
+  redis_data:
