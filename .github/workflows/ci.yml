@@ -75,8 +75,8 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/HW_8_Kurs_b35:${{ github.sha }}
-            docker stop HW_8_Kurs_b35 || true
-            docker rm HW_8_Kurs_b35 || true
+            docker stop myapp || true
+            docker rm myapp || true
             docker run -d \
           --name HW_8_Kurs_b35 \
           --env-file ${{ secrets.DEPLOY_DIR }}/.env \
