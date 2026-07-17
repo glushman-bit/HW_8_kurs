@@ -1,9 +1,9 @@
 services:
-  wed:
+  web:
     build:
       context: .
       dockerfile: Dockerfile
-    command: sh -c 'python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000'
+    command: sh -c 'python manage.py migrate && python manage.py runserver 0.0.0.0:8000'
     volumes:
       - .:/app
     ports:
@@ -12,6 +12,16 @@ services:
       - db
     env_file:
       - .env
+
+  nginx:
+    build:
+      context: ./nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - web
 
   db:
     image: postgres:16.0-alpine
