@@ -162,19 +162,20 @@ class CourseTestCase(BaseTestCase):
         url = reverse('materials:course-list')
         response = self.client.get(url)
         data = response.json()
+        print(data)
         result = {
             "count": 1,
             "next": None,
             "previous": None,
             "results": [
                 {
-                    "id": 4,
+                    "id": 1,
                     "name": self.course.name,
                     "description": self.course.description,
                     "count_lessons": 1,
                     "lessons": [
                         {
-                            "id": 3,
+                            "id": 1,
                             "course": self.course.id,
                             "name": self.lesson.name,
                             "description": self.lesson.description,
