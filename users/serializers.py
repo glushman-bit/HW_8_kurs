@@ -1,13 +1,16 @@
 from rest_framework.serializers import ModelSerializer
+from rest_framework.fields import IntegerField
 
 from materials.serializers import CourseSerializer, LessonSerializer
 
 from .models import Payment, User
-from .validators import validate_payment_choice
+from .validators import validate_payment_choice, validate_payment_amount
 
 
 class PaymentSerializer(ModelSerializer):
     """Сериализатор вывода платежей"""
+
+    amount = IntegerField(validators=[validate_payment_amount])
 
     class Meta:
         model = Payment
