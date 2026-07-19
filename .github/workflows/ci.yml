@@ -77,10 +77,10 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/HW_8_Kurs_b35:${{ github.sha }} .
+        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/hw_8_kurs_b35:${{ github.sha }} .
 
       - name: Push Docker image in Docker hub
-        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/HW_8_Kurs_b35:${{ github.sha }}
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/hw_8_kurs_b35:${{ github.sha }}
 
   deploy:
     needs: build
@@ -94,14 +94,14 @@ jobs:
       - name: Deploy to server
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/HW_8_Kurs_b35:${{ github.sha }}
-            docker stop HW_8_Kurs_b35 || true
-            docker rm HW_8_Kurs_b35 || true
+            docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/hw_8_kurs_b35:${{ github.sha }}
+            docker stop hw_8_kurs_b35 || true
+            docker rm hw_8_kurs_b35 || true
             docker run -d \
-          --name HW_8_Kurs_b35 \
+          --name hw_8_kurs_b35 \
           --env-file ${{ secrets.DEPLOY_DIR }}/.env \
           -p 80:8000 \
-          ${{ secrets.DOCKER_HUB_USERNAME }}/HW_8_Kurs_b35:${{ github.sha }}
+          ${{ secrets.DOCKER_HUB_USERNAME }}/hw_8_kurs_b35:${{ github.sha }}
           EOF
 
 
