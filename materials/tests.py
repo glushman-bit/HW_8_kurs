@@ -7,6 +7,7 @@ from rest_framework.test import APITestCase
 from materials.models import Course, Lesson, Subscription
 from materials.validators import VideoUrlValidator
 from users.models import User
+from unittest.mock import patch
 
 
 class BaseTestCase(APITestCase):
@@ -108,7 +109,8 @@ class LessonTestCase(BaseTestCase):
 class CourseTestCase(BaseTestCase):
     """TestCase для курса."""
 
-    def test_course_create(self):
+    @patch('materials.views.send_information_about_add_course.delay')
+    def test_course_create(self, mock_delay):
         """Тест создания курса."""
         url = reverse('materials:course-list')
         data = {
@@ -126,6 +128,8 @@ class CourseTestCase(BaseTestCase):
         self.assertEqual(course.name, "Course_1")
         self.assertEqual(course.description, "desc_Course_1")
         self.assertEqual(course.owner, self.user)
+
+        mock_delay.assert_called_once_with(self.user.email, "Course_1")
 
     def test_course_retrieve(self):
         """Тест на вывод информации о курсе."""
