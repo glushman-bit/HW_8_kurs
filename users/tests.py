@@ -190,8 +190,14 @@ class PaymentTestCase(APITestCase):
         self.assertIn('status', response.data)
         self.assertEqual(response.data.get('status'), 'paid')
 
-    def test_payment_session_error(self):
+    @patch('users.services.stripe.checkout.Session.retrieve')
+    def test_payment_session_error(self, mock_stripe_session):
         """Тест ошибку, если у платежа нет session_id."""
+
+        fake_session = MagicMock()
+        fake_session.payment_status = 'failed'
+        mock_stripe_session.return_value = fake_session
+
 
         url = reverse('users:payment-retrieve', args=(self.payment_1.pk,))
         response = self.client.get(url)
