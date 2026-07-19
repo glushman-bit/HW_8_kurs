@@ -198,7 +198,6 @@ class PaymentTestCase(APITestCase):
         fake_session.payment_status = 'failed'
         mock_stripe_session.return_value = fake_session
 
-
         url = reverse('users:payment-retrieve', args=(self.payment_1.pk,))
         response = self.client.get(url)
         print(response.text)
