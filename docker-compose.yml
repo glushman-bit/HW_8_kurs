@@ -1,9 +1,6 @@
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: myproject:latest
+    image: username/hw_8_kurs_b35:latest
     command: sh -c 'python manage.py migrate && python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000'
     volumes:
       - static_volume:/app/staticfiles
@@ -52,7 +49,7 @@ services:
       retries: 5
 
   celery:
-    image: myproject:latest
+    image: username/hw_8_kurs_b35:latest
     command: celery -A config worker -l INFO
     depends_on:
       db:
@@ -64,7 +61,7 @@ services:
     restart: unless-stopped
 
   celery-beat:
-    image: myproject:latest
+    image: username/hw_8_kurs_b35:latest
     command: celery -A config beat -l info
     depends_on:
       db:
