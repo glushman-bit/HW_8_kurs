@@ -132,15 +132,15 @@ docker build -t project_name .
 
 Сервисы:
 
-| Сервис        | Назначение                  |
-|:--------------|:----------------------------|
-| web           | Django + Gunicorn           |   
-| db            | PostgresSQL                 |   
-| redis         | Redis брокер для Celery     |
-| celery        | Выполнение фоновых задач    |
-| celery-beat   | Планировщик задач           |
-| nginx         | Reverse pro                 |
-|               |                             
+| Сервис          | Назначение                  |
+|:----------------|:----------------------------|
+| **web**         | Django + Gunicorn           |   
+| **db**          | PostgresSQL                 |   
+| **redis**       | Redis брокер для Celery     |
+| **celery**      | Выполнение фоновых задач    |
+| **celery-beat** | Планировщик задач           |
+| **nginx**       | Reverse pro                 |
+|                 |                             
 
 
 #### Запуск проекта

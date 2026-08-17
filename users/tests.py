@@ -63,6 +63,7 @@ class UsersTestCase(APITestCase):
 
     def test_view_other_profile(self):
         """Просмотр чужого профиля."""
+
         url = reverse('users:user-detail', args=(self.user2.pk,))
         self.client.force_authenticate(user=self.user1)
         response = self.client.get(url)
