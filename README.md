@@ -333,3 +333,5 @@ docker compose logs -f nginx
                     Celery Beat
 
 Проект полностью развернут в Docker и поддерживает автоматический CI/CD деплой через GitHub Actions.
+
+
