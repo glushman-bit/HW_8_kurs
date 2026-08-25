@@ -93,3 +93,245 @@ celery -A config worker -l info
 celery -A config beat -l info
 ```
 
+### Docker и Deploy (ветка 35.2)
+
+#### Docker
+
+Проект контейнеризирован с использованием Docker.
+
+Используется:
+
+- Dockerfile для сборки образа приложения
+- Docker Compose для запуска всех сервисов
+- Docker Hub для хранения Docker image
+- GitHub Actions для автоматической сборки и деплоя
+
+#### Dockerfile
+
+Dockerfile находится в корне проекта.
+
+Он выполняет:
+
+1. Создание контейнера на основе Python 3.14
+2. Установку системных зависимостей
+3. Установку зависимостей Python через Poetry
+4. Копирование проекта внутрь контейнера
+5. Подготовку окружения для запуска Django
+
+
+Сборка образа вручную:
+
+```
+docker build -t project_name .
+```
+
+#### Docker Compose
+
+Файл: docker-compose.yml
+Используется для запуска полного окружения проекта.
+
+Сервисы:
+
+| Сервис          | Назначение                  |
+|:----------------|:----------------------------|
+| **web**         | Django + Gunicorn           |   
+| **db**          | PostgresSQL                 |   
+| **redis**       | Redis брокер для Celery     |
+| **celery**      | Выполнение фоновых задач    |
+| **celery-beat** | Планировщик задач           |
+| **nginx**       | Reverse pro                 |
+|                 |                             
+
+
+#### Запуск проекта
+
+Сборка и запуск:
+```
+docker compose up --build
+```
+Запуск в фоне:
+```
+docker compose up -d
+```
+Остановка:
+```
+docker compose down
+```
+Проверка контейнеров:
+```
+docker compose ps
+```
+
+#### Переменные окружения
+
+Используется файл: .env
+```
+.env.example:
+
+POSTGRES_DB=my_database
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password
+
+POSTGRES_HOST=db
+POSTGRES_PORT=5432
+
+REDIS_HOST=redis
+REDIS_PORT=6379
+
+CELERY_BROKER_URL=redis://redis:6379/0
+CELERY_RESULT_BACKEND=redis://redis:6379/0
+```
+
+#### Celery
+
+Celery использует Redis как брокер сообщений.
+
+Worker запускается командой:
+```
+celery -A config worker -l INFO
+```
+Beat запускается:
+```
+celery -A config beat -l INFO
+```
+Проверка логов:
+```
+docker compose logs -f celery
+docker compose logs -f celery-beat
+```
+
+#### Nginx
+
+Nginx используется как reverse proxy.
+
+Схема работы:
+```
+Пользователь
+      |
+      v
+   Nginx :80
+      |
+      v
+ Gunicorn :8000
+      |
+      v
+ Django
+```
+Конфигурация находится:
+```
+nginx/nginx.conf
+```
+Основная задача Nginx:
+
+ - принимать внешние HTTP-запросы;
+ - передавать их Django;
+ - отдавать статические файлы.
+
+Проверка конфигурации:
+```
+docker compose exec nginx nginx -t
+```
+
+#### Gunicorn
+
+Django запускается через Gunicorn:
+```
+gunicorn config.wsgi:application --bind 0.0.0.0:8000
+```
+Gunicorn работает внутри контейнера web.
+
+#### Deploy на сервер
+
+Автоматический деплой выполняется через GitHub Actions.
+
+Workflow:
+```
+.github/workflows/django.yml
+```
+После успешного прохождения:
+
+ - Проверка кода (flake8)
+ - Запуск тестов
+ - Сборка Docker image
+ - Отправка image в Docker Hub
+ - Подключение к серверу по SSH
+ - Обновление контейнеров
+
+#### GitHub Secrets
+
+Для деплоя используются:
+
+SERVER_IP
+SSH_USER
+SSH_KEY
+DEPLOY_DIR
+
+DOCKER_HUB_USERNAME
+DOCKER_HUB_ACCESS_TOKEN
+
+#### Команды на сервере
+
+Перейти в папку проекта:
+```
+cd /var/www/project
+```
+Получить обновления:
+```
+git pull
+```
+Получить новый Docker image:
+```
+docker compose pull
+```
+Перезапустить приложение:
+```
+docker compose up -d
+```
+Удалить старые образы:
+```
+docker image prune -f
+```
+
+#### Проверка после деплоя
+
+Статус контейнеров:
+```
+docker compose ps
+```
+Логи Django:
+```
+docker compose logs -f web
+```
+Логи Celery:
+```
+docker compose logs -f celery
+```
+Логи Nginx:
+```
+docker compose logs -f nginx
+```
+Итоговая архитектура
+
+                Internet
+                   |
+                   |
+                Nginx
+             port 80
+                   |
+                   |
+              Gunicorn
+             port 8000
+                   |
+                   |
+              Django app
+              /       \
+             /         \
+      PostgreSQL      Redis
+                         |
+                    Celery Worker
+                         |
+                    Celery Beat
+
+Проект полностью развернут в Docker и поддерживает автоматический CI/CD деплой через GitHub Actions.
+
+

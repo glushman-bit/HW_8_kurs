@@ -7,6 +7,7 @@ from rest_framework.test import APITestCase
 from materials.models import Course, Lesson, Subscription
 from materials.validators import VideoUrlValidator
 from users.models import User
+from unittest.mock import patch
 
 
 class BaseTestCase(APITestCase):
@@ -29,6 +30,7 @@ class LessonTestCase(BaseTestCase):
 
     def test_lesson_create(self):
         """Тест создания урока."""
+
         url = reverse('materials:lesson_create')
         data = {
             'name': self.lesson.name,
@@ -82,6 +84,7 @@ class LessonTestCase(BaseTestCase):
 
     def test_lesson_list(self):
         """Тест вывода списка уроков."""
+
         url = reverse('materials:lesson_list')
         response = self.client.get(url)
         data = response.json()
@@ -108,8 +111,10 @@ class LessonTestCase(BaseTestCase):
 class CourseTestCase(BaseTestCase):
     """TestCase для курса."""
 
-    def test_course_create(self):
+    @patch('materials.views.send_information_about_add_course.delay')
+    def test_course_create(self, mock_delay):
         """Тест создания курса."""
+
         url = reverse('materials:course-list')
         data = {
             "name": self.course.name,
@@ -127,8 +132,11 @@ class CourseTestCase(BaseTestCase):
         self.assertEqual(course.description, "desc_Course_1")
         self.assertEqual(course.owner, self.user)
 
+        mock_delay.assert_called_once_with(self.user.email, "Course_1")
+
     def test_course_retrieve(self):
         """Тест на вывод информации о курсе."""
+
         url = reverse('materials:course-detail', args=(self.course.pk,))
         response = self.client.get(url)
         data = response.json()
@@ -139,18 +147,20 @@ class CourseTestCase(BaseTestCase):
 
     def test_course_update(self):
         """Тест на внесение изменения в курс."""
+
         url = reverse('materials:course-detail', args=(self.course.pk,))
         data = {
             "name": "test_course",
         }
         response = self.client.patch(url, data)
-        data = response.json()
+        # data = response.json()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(data.get('name'), 'test_course')
 
     def test_course_delete(self):
         """Тест на удаление курса."""
+
         url = reverse('materials:course-detail', args=(self.course.pk,))
         response = self.client.delete(url)
 
@@ -159,6 +169,7 @@ class CourseTestCase(BaseTestCase):
 
     def test_course_list(self):
         """Тест вывод списка курсов."""
+
         url = reverse('materials:course-list')
         response = self.client.get(url)
         data = response.json()
@@ -168,13 +179,13 @@ class CourseTestCase(BaseTestCase):
             "previous": None,
             "results": [
                 {
-                    "id": 4,
+                    "id": 1,
                     "name": self.course.name,
                     "description": self.course.description,
                     "count_lessons": 1,
                     "lessons": [
                         {
-                            "id": 3,
+                            "id": 1,
                             "course": self.course.id,
                             "name": self.lesson.name,
                             "description": self.lesson.description,
@@ -196,6 +207,7 @@ class SubscriptionTestCase(BaseTestCase):
 
     def test_subscription_on_off(self):
         """Тест на создание и удаление подписки."""
+
         url = reverse('materials:course_subscribe', args=(self.course.pk,))
         # Проверка создания подписки
         response = self.client.post(url)

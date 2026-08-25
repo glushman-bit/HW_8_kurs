@@ -1,17 +1,22 @@
 services:
-  wed:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: sh -c 'python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000'
+  web:
+    image: glushman/hw_8_kurs_b35:latest
+    command: sh -c 'python manage.py migrate && python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000'
     volumes:
-      - .:/app
+      - static_volume:/app/staticfiles
     ports:
       - "8000:8000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     env_file:
       - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000', timeout=3)\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   db:
     image: postgres:16.0-alpine
@@ -26,10 +31,62 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready", "-U postgres" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
       interval: 30s
       timeout: 10s
       retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  celery:
+    image: glushman/hw_8_kurs_b35:latest
+    command: celery -A config worker -l INFO
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  celery-beat:
+    image: glushman/hw_8_kurs_b35:latest
+    command: celery -A config beat -l info
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  nginx:
+    build:
+      context: ./nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - static_volume:/app/staticfiles
+    depends_on:
+      web:
+        condition: service_healthy
+    restart: unless-stopped
+
 
 volumes:
   postgres_data:
+  static_volume:
+  redis_data:

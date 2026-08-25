@@ -14,3 +14,12 @@ def validate_payment_choice(attrs):
         raise ValidationError("Можно оплатить либо курс, либо урок.")
 
     return attrs
+
+
+def validate_payment_amount(value):
+    """Проверка минимальной стоимости платежа."""
+
+    if value < 10000:
+        raise ValidationError("Цена не может быть менее 10000 копеек.")
+
+    return value

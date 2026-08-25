@@ -4,8 +4,26 @@ omit =
     */venv/*
     */.venv/*
     manage.py
+    # Пропуск всех файлов __init__.py в любых папках
+    */__init__.py
+    # Пропуск настроек, ASGI/WSGI конфигураций
+    config/settings.py
+    config/urls.py
+    config/wsgi.py
+    config/asgi.py
+    config/celery.py
+    # Пропуск конфигурационных файлов приложений Django (обычно там только имя приложения)
+    */apps.py
+    */admin.py
+    */urls.py
+    */models.py
+    */tests.py
 
 [report]
 exclude_lines =
     pragma: no cover
     if __name__ == .__main__.:
+    # Исключить строки, которые созданы только для вывода ошибок или дебага
+    raise NotImplementedError
+    def __str__
+    def __repr__

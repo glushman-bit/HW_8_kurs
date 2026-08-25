@@ -26,4 +26,4 @@ class Command(BaseCommand):
             payment_method="transfer",
         )
 
-        self.stdout.write(self.style.SUCCESS(f"Данные о платежах успешно добавлены"))
+        self.stdout.write(self.style.SUCCESS("Данные о платежах успешно добавлены"))
